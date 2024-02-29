@@ -10,10 +10,16 @@ public class BaseGun : MonoBehaviour {
     }
     public void Fire() {
         if (BulletPool != null) {
-            Bullet bullet = BulletPool.GetNewInstance();
-            bullet.transform.position = releasePoint.position;
+            InstantiateAndFireBullet();
 
         }
+    }
+
+    private void InstantiateAndFireBullet() {
+        Bullet bullet = BulletPool.GetNewInstance();
+        bullet.transform.position = releasePoint.position;
+        bullet.transform.rotation = releasePoint.rotation;
+        bullet.Fire(()=>BulletPool.ReturnInstance(bullet));
     }
 
     private void Update() {
