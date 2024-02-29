@@ -54,4 +54,3 @@ public class GenericPoolFactory<T> where T : MonoBehaviour {
         }
     }
 }
-q
