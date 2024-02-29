@@ -1,29 +1,24 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+[Serializable]
 public class GenericPoolFactory<T> where T : MonoBehaviour {
-    private T prefab;
-    private bool isExpandable;
+    [SerializeField]private T prefab;
+    [SerializeField]private bool isExpandable;
     private Queue<T> pooledItems;
     private List<T> itemsInUse;
     private GameObject poolContainer;
-    private int initialCount;
+    [SerializeField] private int initialCount;
 
-    public GenericPoolFactory(T prefab, int initialCount = 10, bool isExpandable = true, Transform parent = null) {
-        this.prefab = prefab;
-        this.initialCount = initialCount;
-        this.isExpandable = isExpandable;
-        Initialize(parent);
-    }
-
-    private void Initialize(Transform parent) {
+    public void Initialize(Transform parent) {
         pooledItems = new Queue<T>();
         itemsInUse = new List<T>();
         poolContainer = new GameObject($"{typeof(T).Name} Pool");
         poolContainer.transform.parent = parent;
 
         for (int i = 0; i < initialCount; i++) {
-            T newItem = Object.Instantiate(prefab, poolContainer.transform);
+            T newItem = UnityEngine.Object.Instantiate(prefab, poolContainer.transform);
             newItem.gameObject.SetActive(false);
             pooledItems.Enqueue(newItem);
         }
@@ -36,7 +31,7 @@ public class GenericPoolFactory<T> where T : MonoBehaviour {
             item.gameObject.SetActive(true);
             return item;
         } else if (isExpandable) {
-            T newItem = Object.Instantiate(prefab, poolContainer.transform);
+            T newItem = UnityEngine.Object.Instantiate(prefab, poolContainer.transform);
             itemsInUse.Add(newItem);
             return newItem;
         } else {
