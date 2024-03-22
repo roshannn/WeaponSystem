@@ -9,4 +9,5 @@ public class WeaponData {
     public AmmoData AmmoData;
     public float ReloadTime;
     public float FireRate;
+    public float RecoilRate;
 }

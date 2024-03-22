@@ -227,6 +227,8 @@ MonoBehaviour:
     isExpandable: 1
     initialCount: 10
   releasePoint: {fileID: 0}
+  currWeapon: {fileID: 11400000, guid: 3da23646f6b9fb84b94c27d93fb3aa3c, type: 2}
+  currTimer: 0
 --- !u!4 &7639445586792150685 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: b1d7a7f973f9bc842b0b16ae31cd03f0, type: 3}

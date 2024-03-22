@@ -34,7 +34,8 @@ MonoBehaviour:
       BodyDamage: 25
       LegDamage: 15
     WeaponType: 1
-    ReloadTime: 4
     AmmoData:
       max: 25
       total: 75
+    ReloadTime: 4
+    FireRate: 0.2
