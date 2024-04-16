@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7cdb63c939eb8a94e875115f9f2d6248, type: 3}
+  m_Name: PlayerInputData
+  m_EditorClassIdentifier: 
+  PlayerInputDataContainer:
+    playerInputData:
+    - PlayerAction: 0
+      keyBind1: 119
+      keyBind2: 32
+    - PlayerAction: 1
+      keyBind1: 120
+      keyBind2: 0
+    - PlayerAction: 2
+      keyBind1: 100
+      keyBind2: 0
+    - PlayerAction: 3
+      keyBind1: 97
+      keyBind2: 0
+    - PlayerAction: 4
+      keyBind1: 32
+      keyBind2: 0
+    - PlayerAction: 5
+      keyBind1: 0
+      keyBind2: 0
+    - PlayerAction: 6
+      keyBind1: 0
+      keyBind2: 0
+    - PlayerAction: 7
+      keyBind1: 0
+      keyBind2: 0
+    - PlayerAction: 8
+      keyBind1: 0
+      keyBind2: 0
+    - PlayerAction: 9
+      keyBind1: 0
+      keyBind2: 0
+    - PlayerAction: 10
+      keyBind1: 0
+      keyBind2: 0
+    - PlayerAction: 11
+      keyBind1: 0
+      keyBind2: 0
+    - PlayerAction: 12
+      keyBind1: 0
+      keyBind2: 0
