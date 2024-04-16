@@ -9,5 +9,6 @@ public class InputSystemInstaller : MonoInstaller {
         Container.Bind<IAccessPlayerActions>().To<InputSystemHandler>().AsSingle();
         Container.BindInstance<KeyBindModifier>(keyBindModifier);
         Container.DeclareSignal<KeyBindingSignals.KeyBindUpdationSignal>().OptionalSubscriber();
+        Container.DeclareSignal<KeyBindingSignals.KeyBindConflictCheckSignal>().OptionalSubscriber();
     }
 }

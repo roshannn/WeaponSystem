@@ -532,6 +532,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: KeyBindPage
       objectReference: {fileID: 0}
+    - target: {fileID: 8689216026013493313, guid: 90817498741bbed4590e6fd149196ce6, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

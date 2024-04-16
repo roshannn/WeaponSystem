@@ -4,10 +4,11 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Zenject;
 
-public class KeyBindController : MonoBehaviour {
+public class KeyBindController : MonoBehaviour,IPointerEnterHandler,IPointerExitHandler {
     private KeyBindModifier _modifier;
     private SignalBus _signalBus;
 
@@ -22,6 +23,9 @@ public class KeyBindController : MonoBehaviour {
     [SerializeField]
     private TMP_Text keyBindText;
 
+    [SerializeField]
+    private Button removeBindingButton;
+
     private PlayerActions currKeyAction;
     private KeyBindType currKeyBindType;
     private KeyCode currKeyCode;
@@ -34,7 +38,13 @@ public class KeyBindController : MonoBehaviour {
         CacheCurrentKeyAction(data.PlayerAction);
         RenderKeyBind(currKeyCode);
         SetKeyBindButton();
+        ToggleRemoveBindingButton(false);
     }
+
+    private void ToggleRemoveBindingButton(bool state) {
+        removeBindingButton.gameObject.SetActive(state);
+    }
+
     public void CacheCurrentKeyAction(PlayerActions currKeyAction) {
         this.currKeyAction = currKeyAction;
     }
@@ -48,6 +58,12 @@ public class KeyBindController : MonoBehaviour {
     public void SetKeyBindButton() {
         keyBindButton.onClick.RemoveAllListeners();
         keyBindButton.onClick.AddListener(UpdateKeyBindDelegate);
+        removeBindingButton.onClick.RemoveAllListeners();
+        removeBindingButton.onClick.AddListener(RemoveBinding);
+    }
+
+    private void RemoveBinding() {
+        HandleKeyBindUpdation(KeyCode.None);
     }
 
     public void UpdateKeyBindDelegate() {
@@ -64,11 +80,15 @@ public class KeyBindController : MonoBehaviour {
 
     public void HandleKeyBindUpdation(KeyCode keyCode) {
         RenderKeyBind(keyCode);
-        currKeyCode = keyCode;
         SetKeyBindButtonColor("000000");
         _signalBus.Fire(new KeyBindingSignals.KeyBindUpdationSignal() {
             currKeyAction = currKeyAction, keyBind = keyCode, keyBindType = currKeyBindType
         });
+        _signalBus.Fire(new KeyBindingSignals.KeyBindConflictCheckSignal() {
+            controller = this, prevKeyBind = currKeyCode, newkeyBind = keyCode
+        });
+        currKeyCode = keyCode;
+
     }
     public void ResetKeyBind() {
         SetKeyBindButtonColor("000000");
@@ -76,8 +96,14 @@ public class KeyBindController : MonoBehaviour {
     }
 
     public void SetConflict(bool state) {
-        if(state) {
-            SetKeyBindButtonColor("E80000");
-        }
+        SetKeyBindButtonColor(state ? "E80000" : "000000");
+    }
+
+    public void OnPointerEnter(PointerEventData eventData) {
+        ToggleRemoveBindingButton(true);
+    }
+
+    public void OnPointerExit(PointerEventData eventData) {
+        ToggleRemoveBindingButton(false);
     }
 }

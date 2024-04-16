@@ -42,6 +42,7 @@ public class InputSystemHandler : IInitializable, IDisposable, IAccessPlayerActi
                 playerInputData.keyBind2 = signalData.keyBind;
             }
         }
+        //SaveKeyBinds();
     }
 
     public Dictionary<PlayerActions, PlayerInputData> GetPlayerInputSettings() {

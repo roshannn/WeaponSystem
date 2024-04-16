@@ -9,4 +9,10 @@ public class KeyBindingSignals
         public KeyCode keyBind;
         public KeyBindType keyBindType;
     }
+
+    public struct KeyBindConflictCheckSignal {
+        public KeyBindController controller;
+        public KeyCode prevKeyBind;
+        public KeyCode newkeyBind;
+    }
 }

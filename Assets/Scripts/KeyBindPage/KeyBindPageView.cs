@@ -1,81 +1,99 @@
 using NaughtyAttributes;
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
 using Zenject;
+
 public class KeyBindPageView : MonoBehaviour {
-
-    private IAccessPlayerActions _accessPlayerActions;
-    private DiContainer _container;
-
-    [Inject]
-    void Construct(IAccessPlayerActions accessPlayerActions, DiContainer container) {
-        _accessPlayerActions = accessPlayerActions;
-        _container = container;
-    }
+    [Inject] private IAccessPlayerActions _accessPlayerActions;
+    [Inject] private DiContainer _container;
+    [Inject] private SignalBus _signalBus;
 
     private Dictionary<PlayerActions, PlayerInputData> currData;
-    private Dictionary<KeyCode, List<KeyBindController>> keyConflicts;
+    private Dictionary<KeyCode, List<KeyBindController>> keyConflicts = new Dictionary<KeyCode, List<KeyBindController>>();
     private Dictionary<PlayerActions, ActionInputContainerView> playerActionToContainerMap;
 
-    [SerializeField]
-    private GenericPoolFactory<ActionInputContainerView> actionInputContainerPool;
-    [SerializeField]
-    private GameObject content;
+    [SerializeField] private GenericPoolFactory<ActionInputContainerView> actionInputContainerPool;
+    [SerializeField] private GameObject content;
 
     private void OnEnable() {
-        playerActionToContainerMap = new Dictionary<PlayerActions, ActionInputContainerView>();
+        SubscribeEvents();
+        InitializeData();
+    }
+
+    private void SubscribeEvents() {
+        _signalBus.Subscribe<KeyBindingSignals.KeyBindConflictCheckSignal>(OnKeyBindUpdate);
+    }
+
+    private void InitializeData() {
         currData = _accessPlayerActions.GetPlayerInputSettings();
+        playerActionToContainerMap = new Dictionary<PlayerActions, ActionInputContainerView>();
+
         _container.Inject(actionInputContainerPool);
         actionInputContainerPool.Initialize(this.transform);
     }
 
-
     [Button("RenderView")]
     public void RenderView() {
         foreach (var data in currData) {
-            ActionInputContainerView actionInputContainer = actionInputContainerPool.GetNewInstance();
+            var actionInputContainer = actionInputContainerPool.GetNewInstance();
             actionInputContainer.RenderContainer(data.Value);
-            playerActionToContainerMap.Add(data.Key, actionInputContainer);
             actionInputContainer.transform.SetParent(content.transform, false);
+            playerActionToContainerMap.Add(data.Key, actionInputContainer);
         }
         CheckForConflicts();
     }
 
     private void CheckForConflicts() {
-        keyConflicts ??= new Dictionary<KeyCode, List<KeyBindController>>();
-        foreach (var kvp in playerActionToContainerMap) {
-            KeyCode keyBind1 = kvp.Value.keyBind1.CurrKeyCode;
-            KeyCode keyBind2 = kvp.Value.keyBind2.CurrKeyCode;
-            if (keyBind1 != KeyCode.None) {
-                if (keyConflicts.ContainsKey(keyBind1)) {
-                    keyConflicts[keyBind1].Add(kvp.Value.keyBind1);
-                } else {
-                    keyConflicts.Add(keyBind1, new List<KeyBindController> { kvp.Value.keyBind1 });
-                }
-            }
-            if (keyBind2 != KeyCode.None) {
-                if (keyConflicts.ContainsKey(keyBind2)) {
-                    keyConflicts[keyBind2].Add(kvp.Value.keyBind2);
-                } else {
-                    keyConflicts.Add(keyBind2, new List<KeyBindController> { kvp.Value.keyBind2 });
-                }
-            }
+        foreach (var entry in playerActionToContainerMap) {
+            AddOrUpdateConflict(entry.Value.keyBind1.CurrKeyCode, entry.Value.keyBind1);
+            AddOrUpdateConflict(entry.Value.keyBind2.CurrKeyCode, entry.Value.keyBind2);
         }
-        foreach(var kvp in keyConflicts) {
-            if (kvp.Value.Count > 1) {
-                foreach (var keyBind in kvp.Value) {
-                    keyBind.SetConflict(true);
-                }
+        HighlightConflicts();
+    }
+
+    private void AddOrUpdateConflict(KeyCode keyCode, KeyBindController controller) {
+        if (keyCode != KeyCode.None) {
+            if (!keyConflicts.TryGetValue(keyCode, out var list)) {
+                list = new List<KeyBindController>();
+                keyConflicts[keyCode] = list;
+            }
+            list.Add(controller);
+        }
+    }
+
+    private void HighlightConflicts() {
+        foreach (var conflict in keyConflicts) {
+            bool isConflict = conflict.Value.Count > 1;
+            foreach (var controller in conflict.Value) {
+                controller.SetConflict(isConflict);
             }
         }
     }
 
-    public void OnDisable() {
+    private void OnKeyBindUpdate(KeyBindingSignals.KeyBindConflictCheckSignal signalData) {
+        if (signalData.prevKeyBind != KeyCode.None) {
+            UpdateConflictList(signalData.prevKeyBind, signalData.controller, false);
+        }
+        if (signalData.newkeyBind != KeyCode.None) {
+            UpdateConflictList(signalData.newkeyBind, signalData.controller, true);
+        }
+        HighlightConflicts();
+    }
+
+    private void UpdateConflictList(KeyCode keyCode, KeyBindController controller, bool add) {
+        if (keyConflicts.TryGetValue(keyCode, out var list)) {
+            if (add) {
+                list.Add(controller);
+            } else {
+                list.Remove(controller);
+            }
+        } else if (add) {
+            keyConflicts[keyCode] = new List<KeyBindController> { controller };
+        }
+    }
+
+    private void OnDisable() {
+        _signalBus.TryUnsubscribe<KeyBindingSignals.KeyBindConflictCheckSignal>(OnKeyBindUpdate);
         actionInputContainerPool.ReturnAllInstances();
     }
-
-
 }
