@@ -4,11 +4,12 @@ using UnityEngine;
 
 public class WeaponHandPosition : MonoBehaviour
 {
-	[SerializeField]
-	private Transform _handTransform;
+	public Transform handTransform;
 
     private void LateUpdate() {
-        transform.position = _handTransform.position;
-        transform.rotation = Quaternion.Euler(_handTransform.rotation.eulerAngles);
+        if(handTransform!= null) {
+            transform.position = handTransform.position;
+            transform.rotation = Quaternion.Euler(handTransform.rotation.eulerAngles);
+        }
     }
 }

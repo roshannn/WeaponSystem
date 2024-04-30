@@ -3,8 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using Zenject;
 
 public class BaseGun : MonoBehaviour {
+
+    [Inject] private DiContainer _container;
     public GenericPoolFactory<Bullet> BulletPool;
     [SerializeField]private Transform releasePoint;
 
@@ -14,6 +17,7 @@ public class BaseGun : MonoBehaviour {
     public Quaternion InitialRotation;
     public bool applyingRecoil;
     protected virtual void Awake() {
+        _container.Inject(BulletPool);
         BulletPool.Initialize(this.transform);
         InitialRotation = transform.rotation;
         prevRotation = transform.rotation;

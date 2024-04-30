@@ -28,7 +28,8 @@ public class GenericPoolFactory<T> where T : MonoBehaviour {
         itemsInUse = new List<T>();
         poolContainer = new GameObject($"{typeof(T).Name} Pool");
         poolContainer.transform.parent = parent;
-        _container.Inject(this);for (int i = 0; i < initialCount; i++) {
+        _container.Inject(this);
+        for (int i = 0; i < initialCount; i++) {
             T newItem = CreateNewItem();
             newItem.gameObject.SetActive(false);
             pooledItems.Enqueue(newItem);
